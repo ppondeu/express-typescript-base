@@ -1,17 +1,8 @@
 import { z } from "zod";
-import { Brand } from "effect";
-
-// user id type for string and uuid
-export type UserId = string & Brand.Brand<"UserId">;
-const createUserId = (value: string): UserId => {
-    const uuidSchema = z.string().uuid();
-    uuidSchema.parse(value);
-    return value as UserId;
-};
 
 // Define the base schema
 export const UserSchema = z.object({
-    id: z.string().uuid().transform(createUserId),
+    id: z.string().uuid(),
     username: z.string(),
     email: z.string().email(),
     password: z.string(),

@@ -1,4 +1,4 @@
-import { UserCreate, UserId, UserModel, UserUpdate } from "./user.model.js";
+import { UserCreate, UserModel, UserUpdate } from "./user.model.js";
 import { v4 as uuidv4 } from "uuid";
 
 export interface UserRepository {
@@ -21,7 +21,7 @@ export class UserRepositoryImpl implements UserRepository {
     async createUser(user: UserCreate): Promise<UserModel> {
         // throw new Error("Method not implemented.");
         const data = {
-            id: uuidv4() as UserId,
+            id: uuidv4(),
             username: user.username,
             email: user.email,
             password: user.password,

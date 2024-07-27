@@ -7,7 +7,6 @@ import { SERVER_HOST, SERVER_PORT } from "../core/index.js";
 import { globalErrorHandler, routeNotFoundHandler } from "../core/index.js";
 import rootRoute from "./root-route.js";
 import { userRoute } from "./modules/index.js";
-import { HandlerMetadata, TypedRoute } from "../core/typed-route.js";
 // ---
 
 const app = express();
