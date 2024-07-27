@@ -2,7 +2,7 @@ import { z } from "zod";
 import { Brand } from "effect";
 
 // user id type for string and uuid
-type UserId = string & Brand.Brand<"UserId">;
+export type UserId = string & Brand.Brand<"UserId">;
 const createUserId = (value: string): UserId => {
     const uuidSchema = z.string().uuid();
     uuidSchema.parse(value);
@@ -44,3 +44,10 @@ export const UserLoginSchema = UserSchema.pick({
 });
 
 export type UserLogin = z.infer<typeof UserLoginSchema>;
+
+export const UserResponseSchema = UserSchema.omit({
+    password: true,
+    refresh_token: true,
+});
+
+export type UserResponse = z.infer<typeof UserResponseSchema>;

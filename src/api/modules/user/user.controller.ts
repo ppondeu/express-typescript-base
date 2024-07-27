@@ -1,36 +1,50 @@
-import { BaseResponse } from "../../../core/base-response.js";
-import { BaseController } from "../../../core/base-controller.js";
-import { route } from "./user.bootstrap.js";
 import { z } from "zod";
-import { UserCreate } from "./user.model.js";
+
+import { BaseResponse, BaseController } from "../../../core/index.js";
+import { route, UserCreateSchema, UserRepository, UserResponse } from "./index.js";
 
 export class UserController extends BaseController {
-    constructor() {
+    constructor(private readonly userRepo: UserRepository) {
         super();
     }
+
     getUsers = route.get("/").handler(async () => {
+        const users = await this.userRepo.getUsers();
+        const usersResponse = users.map((user) => {
+            return {
+                id: user.id,
+                username: user.username,
+                email: user.email,
+            };
+        });
         return {
-            data: ["1", "3"],
-        } satisfies BaseResponse<Array<string>>;
+            data: usersResponse,
+        } satisfies BaseResponse<Array<UserResponse>>;
     });
 
     getUser = route.get("/:id").params(z.object({
         id: z.string().uuid(),
     })).handler(async (req) => {
-        console.log("User fetched", req.params.id);
+        const user = await this.userRepo.getUser(req.params.id);
+        const userResponse = {
+            id: user.id,
+            username: user.username,
+            email: user.email,
+        };
         return {
-            data: "User fetched",
+            data: userResponse,
         };
     });
 
-    createUser = route.post("/").body(z.object({
-        username: z.string(),
-        email: z.string().email(),
-        password: z.string(),
-    })).handler(async ({ body }) => {
-        console.log("User created", body);
+    createUser = route.post("/").body(UserCreateSchema).handler(async ({ body }) => {
+        const createdUser = await this.userRepo.createUser(body);
+        const userResponse = {
+            id: createdUser.id,
+            username: createdUser.username,
+            email: createdUser.email,
+        };
         return {
-            data: body,
-        } satisfies BaseResponse<UserCreate>;
+            data: userResponse,
+        } satisfies BaseResponse<UserResponse>;
     });
 }
