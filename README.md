@@ -1,7 +1,7 @@
 # express + typescript
 #### controller with builder pattern
 #### how it works on your folder
-    1. git clone https://github.com/ppondeu/express-typescript-get-started.git <new_folder_name>
+    1. git clone https://github.com/ppondeu/express-typescript-base.git <new_folder_name>
     
     2. cd express-typescript-get-started
 
