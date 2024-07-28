@@ -1,15 +1,14 @@
 // --- packages imports
 import { v4 as uuidv4 } from "uuid";
 // --- locals imports
-import { BadRequestException, NotFoundException } from "../../../core/errors.js";
 import { UserCreate, UserModel, UserUpdate } from "./user.model.js";
 // ---
 
 export interface UserRepository {
     find(): Promise<Array<UserModel>>;
-    findOne(id: string): Promise<UserModel>;
+    findOne(options: { id?: string; email?: string; username?: string }): Promise<UserModel | null>;
     save(user: UserCreate): Promise<UserModel>;
-    update(id: string, user: UserUpdate): Promise<UserModel>;
+    update(id: string, user: UserUpdate): Promise<UserModel | null>;
     delete(id: string): Promise<boolean>;
 }
 
@@ -19,7 +18,7 @@ export class UserRepositoryDB implements UserRepository {
         throw new Error("Method not implemented.");
     }
 
-    async findOne(id: string): Promise<UserModel> {
+    async findOne(options: { id?: string; email?: string; username?: string }): Promise<UserModel | null> {
         throw new Error("Method not implemented.");
     }
 
@@ -34,21 +33,20 @@ export class UserRepositoryDB implements UserRepository {
     async delete(id: string): Promise<boolean> {
         throw new Error("Method not implemented.");
     }
-
 }
 
 export class UserRepositoryMock implements UserRepository {
     constructor(private db: Array<UserModel>) { }
-    async find(): Promise<Array<UserModel>> {
+    async find(): Promise<UserModel[]> {
         return this.db;
     }
 
-    async findOne(id: string): Promise<UserModel> {
-        const user = this.db.find((user) => user.id === id);
-        if (!user) {
-            throw new NotFoundException("User not found");
-        }
-        return user;
+    async findOne(options: { id?: string; email?: string; username?: string }): Promise<UserModel | null> {
+        return this.db.find(user =>
+            (options.id && user.id === options.id) ||
+            (options.email && user.email === options.email) ||
+            (options.username && user.username === options.username)
+        ) || null;
     }
 
     async save(user: UserCreate): Promise<UserModel> {
@@ -59,34 +57,20 @@ export class UserRepositoryMock implements UserRepository {
             password: user.password,
             refresh_token: null,
         } satisfies UserModel;
-        const index = this.db.findIndex((user) => user.email === data.email || user.username === data.username);
-        if (index !== -1) {
-            throw new BadRequestException("Email or username already exists");
-        }
         this.db.push(data);
         return data;
     }
 
-    async update(id: string, user: UserUpdate): Promise<UserModel> {
-        const index = this.db.findIndex((user) => user.id === id);
-        if (index === -1) {
-            throw new NotFoundException("User not found");
-        }
-
-        const updatedUser = {
-            ...this.db[index],
-            ...user,
-        } satisfies UserModel;
-        this.db[index] = updatedUser;
-
-        return updatedUser;
+    async update(id: string, user: UserUpdate): Promise<UserModel | null> {
+        const index = this.db.findIndex((u) => u.id === id);
+        if (index === -1) return null;
+        this.db[index] = { ...this.db[index], ...user };
+        return this.db[index];
     }
 
     async delete(id: string): Promise<boolean> {
-        const index = this.db.findIndex((user) => user.id === id);
-        if (index === -1) {
-            throw new NotFoundException("User not found");
-        }
+        const index = this.db.findIndex((u) => u.id === id);
+        if (index === -1) return false;
         this.db.splice(index, 1);
         return true;
     }

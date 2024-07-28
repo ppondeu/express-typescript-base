@@ -1,52 +1,36 @@
 // --- packages imports
 import { z } from "zod";
 // --- locals imports
-import { BaseResponse, BaseController } from "../../../core/index.js";
-import { UserCreateSchema, UserRepository, UserResponse } from "./index.js";
+import { BaseResponse, BaseController, NotFoundException } from "../../../core/index.js";
+import { UserCreateSchema, UserResponse } from "./index.js";
 import { TypedRoute } from "../../../core/typed-route.js";
+import { UserService } from "./user.service.js";
 // ---
 
 export class UserController extends BaseController {
     private route = new TypedRoute();
-    constructor(private readonly userRepo: UserRepository) {
+    constructor(private readonly userSrv: UserService) {
         super();
     }
 
     getUsers = this.route.get("/").handler(async () => {
-        const users = await this.userRepo.find();
-        const usersResponse = users.map((user) => {
-            return {
-                id: user.id,
-                username: user.username,
-                email: user.email,
-            };
-        });
+        const usersResponse = await this.userSrv.getUsers();
         return {
             data: usersResponse,
-        } satisfies BaseResponse<Array<UserResponse>>;
+        } satisfies BaseResponse<UserResponse[]>;
     });
 
     getUser = this.route.get("/:id").params(z.object({
         id: z.string().uuid(),
     })).handler(async ({ params }) => {
-        const user = await this.userRepo.findOne(params.id);
-        const userResponse = {
-            id: user.id,
-            username: user.username,
-            email: user.email,
-        };
+        const userResponse = await this.userSrv.getUser(params.id);
         return {
             data: userResponse,
-        };
+        } satisfies BaseResponse<UserResponse>;
     });
 
     createUser = this.route.post("/").body(UserCreateSchema).handler(async ({ body }) => {
-        const createdUser = await this.userRepo.save(body);
-        const userResponse = {
-            id: createdUser.id,
-            username: createdUser.username,
-            email: createdUser.email,
-        };
+        const userResponse = await this.userSrv.createUser(body);
         return {
             data: userResponse,
         } satisfies BaseResponse<UserResponse>;
@@ -55,12 +39,7 @@ export class UserController extends BaseController {
     updateUser = this.route.put("/:id").params(z.object({
         id: z.string().uuid(),
     })).body(UserCreateSchema).handler(async ({ params, body }) => {
-        const updatedUser = await this.userRepo.update(params.id, body);
-        const userResponse = {
-            id: updatedUser.id,
-            username: updatedUser.username,
-            email: updatedUser.email,
-        };
+        const userResponse = await this.userSrv.updateUser(params.id, body);
         return {
             data: userResponse,
         } satisfies BaseResponse<UserResponse>;
@@ -69,7 +48,7 @@ export class UserController extends BaseController {
     deleteUser = this.route.delete("/:id").params(z.object({
         id: z.string().uuid(),
     })).handler(async ({ params }) => {
-        await this.userRepo.delete(params.id);
+        await this.userSrv.deleteUser(params.id);
         return {
             data: true,
         } satisfies BaseResponse<boolean>;

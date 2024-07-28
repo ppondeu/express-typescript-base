@@ -5,3 +5,4 @@ export * from "./config/index.js";
 export * from "./middlewares/index.js";
 export * from "./types.js";
 export * from "./data.js";
+export * from "./utils.js";

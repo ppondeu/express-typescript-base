@@ -60,6 +60,7 @@ export class TypedRouteHandler<
     static catchAsync = (fn: (...args: any[]) => any) => (req: Request, res: Response, next: NextFunction) => {
         Promise.resolve(fn(req, res, next)).catch((err) => next(err));
     };
+    
     static preRequest = (handler: RequestHandler) => {
         const invokeHandler = async (req: Request, res: Response, next: NextFunction) => {
             const result = await handler(req, res, next);
@@ -87,7 +88,7 @@ export class TypedRouteHandler<
         return this as unknown as TypedRouteHandler<TQuery, TBody, Params>;
     }
 
-    handler(handler: TypedHandler<TQuery, TParams, TBody>) {
+    handler(hndr: TypedHandler<TQuery, TParams, TBody>) {
         const invokeHandler = async (req: Request, res: Response) => {
             let message, body, params, query;
             try {
@@ -110,7 +111,7 @@ export class TypedRouteHandler<
                     throw new InternalServerErrorException(`${err}`);
                 }
             }
-            return handler({ query, params, body, req, res });
+            return hndr({ query, params, body, req, res });
         }
         return TypedRouteHandler.preRequest(invokeHandler);
     }
