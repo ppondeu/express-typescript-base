@@ -1,11 +1,17 @@
-import { Request, Response } from 'express-serve-static-core';
+import { Request, Response, NextFunction } from "express-serve-static-core";
 import { z } from 'zod';
 import { BaseResponse } from './base-response.js';
-import { MaybePromise } from './types.js';
+import { MaybePromise, RequestHandler } from './types.js';
 import { BadRequestException, InternalServerErrorException } from './errors.js';
-import { RequestHandler } from './custom-router.js';
+
 export class TypedRoute {
-    constructor() { }
+    static instance: TypedRoute | undefined;
+    constructor() {
+        if (TypedRoute.instance) {
+            return TypedRoute.instance;
+        }
+        TypedRoute.instance = this;
+    }
 
     get(path: string) {
         return new TypedRouteHandler(path, 'get');
@@ -55,6 +61,21 @@ export class TypedRouteHandler<
 
     constructor(private readonly path: string, private readonly method: string) { }
 
+    static catchAsync = (fn: (...args: any[]) => any) => (req: Request, res: Response, next: NextFunction) => {
+        Promise.resolve(fn(req, res, next)).catch((err) => next(err));
+    };
+    static preRequest = (handler: RequestHandler) => {
+        const invokeHandler = async (req: Request, res: Response, next: NextFunction) => {
+            const result = await handler(req, res, next);
+            return res.send({
+                success: true,
+                message: "Request successful",
+                ...result,
+            } satisfies BaseResponse);
+        };
+        return this.catchAsync(invokeHandler);
+    }
+
     body<Body extends z.ZodTypeAny>(schema: Body) {
         this.schema.body = schema;
         return this as unknown as TypedRouteHandler<TQuery, Body, TParams>;
@@ -70,7 +91,7 @@ export class TypedRouteHandler<
         return this as unknown as TypedRouteHandler<TQuery, TBody, Params>;
     }
 
-    handler(handler: TypedHandler<TQuery, TParams, TBody>): HandlerMetadata {
+    handler(handler: TypedHandler<TQuery, TParams, TBody>) {
         const invokeHandler = async (req: Request, res: Response) => {
             let message, body, params, query;
             try {
@@ -95,11 +116,6 @@ export class TypedRouteHandler<
             }
             return handler({ query, params, body, req, res });
         }
-        return {
-            method: this.method,
-            path: this.path,
-            handler: invokeHandler,
-            __handlerMetadata: true
-        }
+        return TypedRouteHandler.preRequest(invokeHandler);
     }
 }

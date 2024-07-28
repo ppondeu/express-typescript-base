@@ -1,4 +1,9 @@
-import { CustomRouter } from "../../../core/custom-router.js";
 import { userController } from "./user.bootstrap.js";
+import { Router } from "express";
 
-export default new CustomRouter().registerClassRoutes(userController).instance;
+const router = Router();
+router.get("/", userController.getUsers);
+router.get("/:id", userController.getUser);
+router.post("/", userController.createUser);
+
+export default router;

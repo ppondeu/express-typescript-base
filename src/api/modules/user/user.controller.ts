@@ -36,6 +36,7 @@ export class UserController extends BaseController {
         };
     });
 
+
     createUser = route.post("/").body(UserCreateSchema).handler(async ({ body }) => {
         const createdUser = await this.userRepo.createUser(body);
         const userResponse = {

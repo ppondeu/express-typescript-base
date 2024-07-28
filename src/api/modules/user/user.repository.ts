@@ -15,7 +15,13 @@ export class UserRepositoryImpl implements UserRepository {
     }
 
     async getUser(id: string): Promise<UserModel> {
-        throw new Error("Method not implemented.");
+        return {
+            id: id,
+            username: "test",
+            email: "test@mail.com",
+            password: "test",
+            refresh_token: null,
+        } satisfies UserModel;
     }
 
     async createUser(user: UserCreate): Promise<UserModel> {
