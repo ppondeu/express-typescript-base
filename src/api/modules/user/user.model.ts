@@ -1,6 +1,6 @@
+// --- packages imports
 import { z } from "zod";
-
-// Define the base schema
+// ---
 export const UserSchema = z.object({
     id: z.string().uuid(),
     username: z.string(),
@@ -9,10 +9,8 @@ export const UserSchema = z.object({
     refresh_token: z.string().nullable(),
 });
 
-// Define the base model type
 export type UserModel = z.infer<typeof UserSchema>;
 
-// Use Pick and Partial to define other schemas
 export const UserCreateSchema = UserSchema.pick({
     username: true,
     email: true,

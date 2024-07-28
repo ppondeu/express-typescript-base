@@ -1,8 +1,11 @@
+// --- packages import
 import { Request, Response, NextFunction } from "express-serve-static-core";
 import { z } from 'zod';
+// --- locals import
 import { BaseResponse } from './base-response.js';
 import { MaybePromise, RequestHandler } from './types.js';
 import { BadRequestException, InternalServerErrorException } from './errors.js';
+// ---
 
 export class TypedRoute {
     static instance: TypedRoute | undefined;
@@ -25,13 +28,6 @@ export class TypedRoute {
     delete(path: string) {
         return new TypedRouteHandler(path, 'delete');
     }
-}
-
-export type HandlerMetadata = {
-    method: string;
-    path: string;
-    handler: RequestHandler;
-    __handlerMetadata: boolean;
 }
 
 export type TypedHandler<

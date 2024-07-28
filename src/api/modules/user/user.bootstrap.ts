@@ -1,8 +1,8 @@
-import { TypedRoute } from "../../../core/typed-route.js";
+// --- locals imports
+import { users } from "../../../core/index.js";
 import { UserController } from "./user.controller.js";
-import { UserRepositoryImpl } from "./user.repository.js";
-
-export const route = new TypedRoute();
-const userRepo = new UserRepositoryImpl();
+import { UserRepositoryMock } from "./user.repository.js";
+// ---
+const userRepo = new UserRepositoryMock(users);
 
 export const userController = new UserController(userRepo);

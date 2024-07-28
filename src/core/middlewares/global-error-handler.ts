@@ -1,6 +1,9 @@
+// --- package imports
+import { Request, Response, NextFunction } from 'express-serve-static-core';
+// --- locals imports
 import { BaseResponse } from '../base-response.js';
 import { HttpException } from '../errors.js';
-import { Request, Response, NextFunction } from 'express-serve-static-core';
+// ---
 
 export const globalErrorHandler = (err: unknown, _req: Request, res: Response<BaseResponse<undefined>>, _next: NextFunction) => {
     if (err instanceof HttpException) {

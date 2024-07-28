@@ -1,7 +1,11 @@
+// --- package imports ---
+import { Request, Response, NextFunction } from "express-serve-static-core";
+// --- locals imports ---
 import { BaseResponse } from "./base-response.js";
 import { HttpMethod, RequestHandler } from "./types.js";
-import { Request, Response, NextFunction } from "express-serve-static-core";
-export function isHttpMethod(method: any): method is HttpMethod {
+// ---
+
+export const isHttpMethod = (method: any): method is HttpMethod => {
     return ['get', 'post', 'put', 'delete'].includes(method);
 }
 

@@ -3,8 +3,7 @@ import express, { json } from "express";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 // --- local imports
-import { SERVER_HOST, SERVER_PORT } from "../core/index.js";
-import { globalErrorHandler, routeNotFoundHandler } from "../core/index.js";
+import { SERVER_HOST, SERVER_PORT, globalErrorHandler, routeNotFoundHandler } from "../core/index.js";
 import rootRoute from "./root-route.js";
 import { userRoute } from "./modules/index.js";
 // ---
