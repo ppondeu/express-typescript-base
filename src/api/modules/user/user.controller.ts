@@ -1,7 +1,7 @@
 // --- packages imports
 import { z } from "zod";
 // --- locals imports
-import { BaseResponse, BaseController, NotFoundException } from "../../../core/index.js";
+import { BaseResponse, BaseController } from "../../../core/index.js";
 import { UserCreateSchema, UserResponse } from "./index.js";
 import { TypedRoute } from "../../../core/typed-route.js";
 import { UserService } from "./user.service.js";
