@@ -47,10 +47,10 @@ export class TypedRouteHandler<
     TParams extends z.ZodTypeAny = z.ZodTypeAny
 > {
 
-    schema: {
+    private schema: {
         query?: z.ZodTypeAny;
-        body?: any;
-        params?: any;
+        body?: z.ZodTypeAny;
+        params?: z.ZodTypeAny;
     } = {};
 
     constructor(private readonly path: string, private readonly method: string) { }
